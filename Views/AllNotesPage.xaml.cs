@@ -12,38 +12,33 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinUINotes.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace WinUINotes
+namespace WinUINotes.Views
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class AllNotesPage : Page
     {
-        public MainWindow()
+        private AllNotes notesModel = new AllNotes();
+
+        public AllNotesPage()
         {
             InitializeComponent();
-
-            // Hide the default system title bar.
-            ExtendsContentIntoTitleBar = true;
-            // Replace system title bar with the WinUI TitleBar.
-            SetTitleBar(AppTitleBar);
         }
 
-        private void AppTitleBar_BackRequested(TitleBar sender, object args)
+        private void NewNoteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (rootFrame.CanGoBack == true)
-            {
-                rootFrame.GoBack();
-            }
+            Frame.Navigate(typeof(NotePage));
         }
 
-        private void ApTitleBar_BackRequested(TitleBar sender, object args)
+        private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args)
         {
-
+            Frame.Navigate(typeof(NotePage), args.InvokedItem);
         }
     }
 }

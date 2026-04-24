@@ -13,49 +13,56 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using WinUINotes.Models;
 
-namespace WinUINotes
+namespace WinUINotes.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class NotePage : Page
     {
-        private StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-        private StorageFile? noteFile = null;
-        private string fileName = "note.txt";
+        private Note? noteModel;
 
         public NotePage()
         {
             InitializeComponent();
-            Loaded += NotePage_Loaded;
         }
 
-        private async void NotePage_Loaded(object sender, RoutedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            noteFile = (StorageFile)await storageFolder.TryGetItemAsync(fileName);
-            if (noteFile is not null)
+            base.OnNavigatedTo(e);
+
+            if (e.Parameter is Note note)
             {
-                NoteEditor.Text = await FileIO.ReadTextAsync(noteFile);
+                noteModel = note;
+            }
+            else
+            {
+                noteModel = new Note();
             }
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (noteFile is null)
+            if(noteModel is not null)
             {
-                noteFile = await storageFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await noteModel.SaveAsync();
+
+                Frame.GoBack();
             }
-            await FileIO.WriteTextAsync(noteFile, NoteEditor.Text);
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (noteFile is not null)
+            if (noteModel is not null)
             {
-                await noteFile.DeleteAsync();
-                noteFile = null;
-                NoteEditor.Text = string.Empty;
+                await noteModel.DeleteAsync();
+            }
+
+            if(Frame.CanGoBack == true)
+            {
+                Frame.GoBack();
             }
         }
     }
